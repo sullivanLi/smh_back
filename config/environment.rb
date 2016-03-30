@@ -10,5 +10,5 @@ Dir.glob(File.join(File.dirname(__FILE__), "../lib/**/*.rb")).each {|file| requi
 
 # rabl setting
 Rabl.configure do |config|
-	config.view_paths = [File.join(File.dirname(__FILE__), "../lib/smh/views/")]
+  config.view_paths = [File.join(File.dirname(__FILE__), "../lib/smh/views/")]
 end

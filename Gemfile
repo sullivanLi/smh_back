@@ -7,7 +7,7 @@ gem 'rabl'
 
 group :test do
   gem 'rack-test'
-	gem 'factory_girl', "~> 4.0"
-	gem 'faker'
-	gem 'pry'
+  gem 'factory_girl', "~> 4.0"
+  gem 'faker'
+  gem 'pry'
 end

@@ -5,18 +5,18 @@ require 'json'
 require './config/environment'
 
 module WithRollback
-	def temporarily(&block)
-		ActiveRecord::Base.connection.transaction do
-			block.call
-			raise ActiveRecord::Rollback
-		end
-	end
+  def temporarily(&block)
+    ActiveRecord::Base.connection.transaction do
+      block.call
+      raise ActiveRecord::Rollback
+    end
+  end
 end
 
 class Minitest::Unit::TestCase
-	include Rack::Test::Methods
+  include Rack::Test::Methods
   include FactoryGirl::Syntax::Methods
-	include WithRollback
+  include WithRollback
 end
 
 FactoryGirl.find_definitions

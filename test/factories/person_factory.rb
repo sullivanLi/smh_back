@@ -1,5 +1,5 @@
 FactoryGirl.define do
-	factory :person do
-		name Faker::Name.name
-	end
+  factory :person do
+    name Faker::Name.name
+  end
 end
