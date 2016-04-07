@@ -17,11 +17,12 @@ class APITest < MiniTest::Unit::TestCase
   def test_add_time_to_event
     temporarily do
       event = create(:event)
-      event_time = Time.now.strftime("%Y/%m/%d %H:%M")
-      post "/event/#{event.id}/time", {time: event_time}
+      time = Time.now.strftime("%Y/%m/%d %H:%M")
+      post "/event/#{event.id}/time", {time: time}
+      event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ?", time)
 
       assert_equal 200, last_response.status
-      assert_equal event_time, event.times.first.event_time.strftime("%Y/%m/%d %H:%M")
+      assert_includes event.times, event_time
     end
   end
 
@@ -31,7 +32,7 @@ class APITest < MiniTest::Unit::TestCase
       event_time = Time.now.strftime("%Y/%m/%d %H:%M")
       event.times.create(event_time: event_time)
       post "/event/#{event.id}/time", {time: event_time}
-    
+
       assert_equal 422, last_response.status
       assert_equal 1, event.times.count
     end
@@ -41,12 +42,14 @@ class APITest < MiniTest::Unit::TestCase
     temporarily do
       event = create(:event)
       name = Faker::Name.name
-      event_time = Time.now.strftime("%Y/%m/%d %H:%M")
-      post "/event/#{event.id}/person", {time: event_time, person_name: name}
+      time = Time.now.strftime("%Y/%m/%d %H:%M")
+      post "/event/#{event.id}/person", {time: time, person_name: name}
+      event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ? and event_id = ?", time, event.id)
+      person = Person.find_by(name: name)
 
       assert_equal 200, last_response.status
-      assert_equal event_time, event.times.first.event_time.strftime("%Y/%m/%d %H:%M")
-      assert_equal name, event.times.first.people.first.name
+      assert_includes event.times, event_time
+      assert_includes event_time.people, person
     end
   end
 
