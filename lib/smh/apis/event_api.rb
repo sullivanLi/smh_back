@@ -27,6 +27,18 @@ class EventAPI < Sinatra::Base
     end
   end
 
+  delete '/event/:id/person' do
+    event = Event.find(params['id'])
+    if params['time'].present? && params['person_name'].present?
+      event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ? and event_id = ?", params['time'], event.id)
+      person = Person.find_by(name: params['person_name'])
+      if event_time.present? && person.present?
+        event_person_time = EventPersonTime.find_by(event_time_id: event_time.id, person_id: person.id)
+        event_person_time.delete if event_person_time.present?
+      end
+    end
+  end
+
   get '/event/:id' do
     @event = Event.find(params['id'])
     Rabl::Renderer.json(@event, 'event_summary')

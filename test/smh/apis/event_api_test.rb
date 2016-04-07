@@ -51,6 +51,18 @@ class APITest < MiniTest::Unit::TestCase
   end
 
   def test_remove_time_from_event_with_person
+    temporarily do
+      event = create(:event_with_all)
+      eventTime = event.times.sample
+      person = eventTime.people.sample
+      event_time = eventTime.event_time.strftime("%Y/%m/%d %H:%M")
+      name = person.name
+      delete "/event/#{event.id}/person", {time: event_time, person_name: name}
+      eventTime.reload
+
+      assert_equal 200, last_response.status
+      refute_includes eventTime.people, person 
+    end
   end
 
   def test_get_event_times_summary
