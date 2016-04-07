@@ -17,6 +17,15 @@ class EventAPI < Sinatra::Base
       end
     end
   end
+  
+  post '/event/:id/person' do
+    event = Event.find(params['id'])
+    if params['time'].present? && params['person_name'].present?
+      event_time = EventTime.find_or_create_by(event_id: event.id, event_time: params['time'].to_datetime)
+      person = Person.find_or_create_by(name: params['person_name'])
+      event_person_time = EventPersonTime.find_or_create_by(event_time_id: event_time.id, person_id: person.id)
+    end
+  end
 
   get '/event/:id' do
     @event = Event.find(params['id'])
