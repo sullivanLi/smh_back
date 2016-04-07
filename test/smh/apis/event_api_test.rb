@@ -26,13 +26,15 @@ class APITest < MiniTest::Unit::TestCase
   end
 
   def test_add_existing_time_to_event
-    event = create(:event)
-    event_time = Time.now.strftime("%Y/%m/%d %H:%M")
-    event.times.create(event_time: event_time)
-    post "/event/#{event.id}/time", {time: event_time}
+    temporarily do
+      event = create(:event)
+      event_time = Time.now.strftime("%Y/%m/%d %H:%M")
+      event.times.create(event_time: event_time)
+      post "/event/#{event.id}/time", {time: event_time}
     
-    assert_equal 422, last_response.status
-    assert_equal 1, event.times.count
+      assert_equal 422, last_response.status
+      assert_equal 1, event.times.count
+    end
   end
 
   def test_add_time_to_event_with_person
