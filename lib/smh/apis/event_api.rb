@@ -6,10 +6,15 @@ class EventAPI < Sinatra::Base
   end
 
   post '/event/:id/time' do
-    @event = Event.find(params['id'])
+    event = Event.find(params['id'])
     if params['time'].present?
-      event_time = params['time']
-      @event.times.create(event_time: event_time.to_datetime)
+      time = event.times.new(event_time: params['time'].to_datetime)
+      if time.valid?
+        time.save
+      else
+        status 422
+        body time.errors.messages
+      end
     end
   end
 
