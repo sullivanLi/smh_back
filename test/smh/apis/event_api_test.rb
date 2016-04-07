@@ -15,6 +15,14 @@ class APITest < MiniTest::Unit::TestCase
   end
 
   def test_add_time_to_event
+    temporarily do
+      event = create(:event)
+      event_time = Time.now.strftime("%Y/%m/%d %H:%M")
+      post "/event/#{event.id}/time", {time: event_time}
+
+      assert_equal 200, last_response.status
+      assert_equal event_time, event.times.first.event_time.strftime("%Y/%m/%d %H:%M")
+    end
   end
 
   def test_add_time_to_event_with_person
