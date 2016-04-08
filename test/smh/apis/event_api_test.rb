@@ -88,6 +88,19 @@ class APITest < MiniTest::Unit::TestCase
   end
 
   def test_get_personal_times_summary
+    temporarily do
+      event = create(:event_with_all)
+      person = event.times.sample.people.sample
+      get "/event/#{event.id}/person/#{person.id}"
+
+      data = JSON.parse last_response.body
+      assert_equal 200, last_response.status
+      assert_equal event.id, data['event_id']
+      assert_equal person.id, data['person_id']
+      assert data['available_times_count']
+      assert data['available_times']
+      assert data['available_times'].kind_of?(Array)
+    end
   end
 
   def test_specific_time_summary

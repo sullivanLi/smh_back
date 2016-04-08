@@ -43,4 +43,13 @@ class EventAPI < Sinatra::Base
     @event = Event.find(params['id'])
     Rabl::Renderer.json(@event, 'event_summary')
   end
+
+  get '/event/:id/person/:person_id' do
+    event = Event.find(params['id'])
+    person = Person.find(params['person_id'])
+    if event.present? && person.present?
+      @times = EventTime.includes(:event, :people).where(event_id: event.id, people: {id: person.id})
+      Rabl::Renderer.json(@times, 'event_personal_summary')
+    end
+  end
 end
