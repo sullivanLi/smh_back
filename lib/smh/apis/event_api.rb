@@ -52,4 +52,9 @@ class EventAPI < Sinatra::Base
       Rabl::Renderer.json(@times, 'event_personal_summary')
     end
   end
+
+  get '/event/:id/time/:event_time_id' do
+    @event_time = EventTime.find_by(id: params['event_time_id'], event_id: params['id'])
+    Rabl::Renderer.json(@event_time, 'event_time_summary')
+  end
 end
