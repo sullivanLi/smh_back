@@ -1,6 +1,12 @@
 require './config/environment'
 
 class EventAPI < Sinatra::Base
+  before do
+    content_type :json    
+    headers 'Access-Control-Allow-Origin' => '*', 
+    'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']  
+  end
+
   post '/events' do
     Event.create(name: params['name']) if params['name'].present?
   end
