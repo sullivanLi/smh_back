@@ -7,7 +7,7 @@ class APITest < MiniTest::Unit::TestCase
 
   def test_create_event
     temporarily do
-      post '/event', {name: 'test_event'}
+      post '/events', {name: 'test_event'}
 
       assert_equal 200, last_response.status
       assert_equal true, Event.find_by_name('test_event').present?
@@ -18,7 +18,7 @@ class APITest < MiniTest::Unit::TestCase
     temporarily do
       event = create(:event)
       time = Time.now.strftime("%Y/%m/%d %H:%M")
-      post "/event/#{event.id}/time", {time: time}
+      post "/events/#{event.id}/times", {time: time}
       event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ?", time)
 
       assert_equal 200, last_response.status
@@ -31,7 +31,7 @@ class APITest < MiniTest::Unit::TestCase
       event = create(:event)
       event_time = Time.now.strftime("%Y/%m/%d %H:%M")
       event.times.create(event_time: event_time)
-      post "/event/#{event.id}/time", {time: event_time}
+      post "/events/#{event.id}/times", {time: event_time}
 
       assert_equal 422, last_response.status
       assert_equal 1, event.times.count
@@ -43,7 +43,7 @@ class APITest < MiniTest::Unit::TestCase
       event = create(:event)
       name = Faker::Name.name
       time = Time.now.strftime("%Y/%m/%d %H:%M")
-      post "/event/#{event.id}/person", {time: time, person_name: name}
+      post "/events/#{event.id}/people", {time: time, person_name: name}
       event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ? and event_id = ?", time, event.id)
       person = Person.find_by(name: name)
 
@@ -60,7 +60,7 @@ class APITest < MiniTest::Unit::TestCase
       person = eventTime.people.sample
       event_time = eventTime.event_time.strftime("%Y/%m/%d %H:%M")
       name = person.name
-      delete "/event/#{event.id}/person", {time: event_time, person_name: name}
+      delete "/events/#{event.id}/people", {time: event_time, person_name: name}
       eventTime.reload
 
       assert_equal 200, last_response.status
@@ -71,14 +71,16 @@ class APITest < MiniTest::Unit::TestCase
   def test_get_event_times_summary
     temporarily do
       event = create(:event_with_all)
-      get "/event/#{event.id}"
+      get "/events/#{event.id}"
 
       data = JSON.parse last_response.body
       assert_equal 200, last_response.status
       assert_equal event.id, data['event_id']
+      assert_equal event.name, data['event_name']
       assert data['event_times_count']
       assert data['event_times']
       assert data['event_times'].kind_of?(Array)
+      assert data['event_times'].first['event_time']['time']
       assert data['event_times'].first['event_time']['people_count']
       assert data['event_times'].first['event_time']['people']
       assert data['event_times'].first['event_time']['people'].kind_of?(Array)
@@ -91,7 +93,7 @@ class APITest < MiniTest::Unit::TestCase
     temporarily do
       event = create(:event_with_all)
       person = event.times.sample.people.sample
-      get "/event/#{event.id}/person/#{person.id}"
+      get "/events/#{event.id}/people/#{person.id}"
 
       data = JSON.parse last_response.body
       assert_equal 200, last_response.status
@@ -107,7 +109,7 @@ class APITest < MiniTest::Unit::TestCase
     temporarily do
       event = create(:event_with_all)
       event_time = event.times.sample
-      get "/event/#{event.id}/time/#{event_time.id}"
+      get "/events/#{event.id}/times/#{event_time.id}"
 
       data = JSON.parse last_response.body
       assert_equal 200, last_response.status
