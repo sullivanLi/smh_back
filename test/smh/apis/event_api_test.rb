@@ -7,10 +7,12 @@ class APITest < MiniTest::Unit::TestCase
 
   def test_create_event
     temporarily do
-      post '/events', {name: 'test_event'}
+      post '/events', {name: 'test_event', description: 'test_desc'}
+      event = Event.find_by_name('test_event')
 
       assert_equal 200, last_response.status
-      assert_equal true, Event.find_by_name('test_event').present?
+      assert_equal true, event.present?
+      assert_equal event.description, 'test_desc'
     end
   end
 

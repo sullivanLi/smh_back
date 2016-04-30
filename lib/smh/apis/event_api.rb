@@ -8,7 +8,11 @@ class EventAPI < Sinatra::Base
   end
 
   post '/events' do
-    Event.create(name: params['name']) if params['name'].present?
+    name = params['name']
+    desc = params['description']
+    if name.present? && desc.present?
+      Event.create(name: name, description: desc)
+    end
   end
 
   post '/events/:id/times' do
