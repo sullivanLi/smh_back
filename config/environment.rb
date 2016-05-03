@@ -11,4 +11,6 @@ Dir.glob(File.join(File.dirname(__FILE__), "../lib/**/*.rb")).each {|file| requi
 # rabl setting
 Rabl.configure do |config|
   config.view_paths = [File.join(File.dirname(__FILE__), "../lib/smh/views/")]
+  config.include_json_root = false
+  config.include_child_root = false
 end
