@@ -40,29 +40,26 @@ class APITest < MiniTest::Unit::TestCase
     end
   end
 
-  def test_add_time_to_event_with_person
+  def test_add_person_to_time
     temporarily do
-      event = create(:event)
-      name = Faker::Name.name
-      time = Time.now.strftime("%Y/%m/%d %H:%M")
-      post "/events/#{event.id}/people", {time: time, person_name: name}
-      event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ? and event_id = ?", time, event.id)
-      person = Person.find_by(name: name)
+      event = create(:event_with_all)
+      eventTime = event.times.sample
+      person_name = Faker::Name.name
+      post "/times/#{eventTime.id}/person", {person_name: person_name}
+      person = Person.find_by(name: person_name)
 
       assert_equal 200, last_response.status
-      assert_includes event.times, event_time
-      assert_includes event_time.people, person
+      assert_includes eventTime.people, person
     end
   end
 
-  def test_remove_time_from_event_with_person
+  def test_remove_person_from_time
     temporarily do
       event = create(:event_with_all)
       eventTime = event.times.sample
       person = eventTime.people.sample
-      event_time = eventTime.event_time.strftime("%Y/%m/%d %H:%M")
       name = person.name
-      delete "/events/#{event.id}/people", {time: event_time, person_name: name}
+      delete "/times/#{eventTime.id}/person", {person_name: name}
       eventTime.reload
 
       assert_equal 200, last_response.status

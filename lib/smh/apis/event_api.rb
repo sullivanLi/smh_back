@@ -2,9 +2,12 @@ require './config/environment'
 
 class EventAPI < Sinatra::Base
   before do
-    content_type :json    
-    headers 'Access-Control-Allow-Origin' => '*', 
-    'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']  
+    content_type :json
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    if request.request_method == 'OPTIONS'
+      response.headers["Access-Control-Allow-Methods"] = "POST, DELETE"
+      halt 200
+    end
   end
 
   post '/events' do
@@ -23,24 +26,22 @@ class EventAPI < Sinatra::Base
         time.save
       else
         status 422
-        body time.errors.messages
+        body time.errors.messages.to_s
       end
     end
   end
   
-  post '/events/:id/people' do
-    event = Event.find(params['id'])
-    if params['time'].present? && params['person_name'].present?
-      event_time = EventTime.find_or_create_by(event_id: event.id, event_time: params['time'].to_datetime)
+  post '/times/:id/person' do
+    event_time = EventTime.find(params['id'])
+    if event_time.present? && params['person_name'].present?
       person = Person.find_or_create_by(name: params['person_name'])
       event_person_time = EventPersonTime.find_or_create_by(event_time_id: event_time.id, person_id: person.id)
     end
   end
 
-  delete '/events/:id/people' do
-    event = Event.find(params['id'])
-    if params['time'].present? && params['person_name'].present?
-      event_time = EventTime.find_by("strftime('%Y/%m/%d %H:%M', event_time) = ? and event_id = ?", params['time'], event.id)
+  delete '/times/:id/person' do
+    if params['person_name'].present?
+      event_time = EventTime.find(params['id'])
       person = Person.find_by(name: params['person_name'])
       if event_time.present? && person.present?
         event_person_time = EventPersonTime.find_by(event_time_id: event_time.id, person_id: person.id)
