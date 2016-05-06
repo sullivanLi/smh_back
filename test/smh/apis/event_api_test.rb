@@ -74,17 +74,17 @@ class APITest < MiniTest::Unit::TestCase
 
       data = JSON.parse last_response.body
       assert_equal 200, last_response.status
-      assert_equal event.id, data['event_id']
-      assert_equal event.name, data['event_name']
-      assert data['event_times_count']
-      assert data['event_times']
-      assert data['event_times'].kind_of?(Array)
-      assert data['event_times'].first['event_time']['time']
-      assert data['event_times'].first['event_time']['people_count']
-      assert data['event_times'].first['event_time']['people']
-      assert data['event_times'].first['event_time']['people'].kind_of?(Array)
-      assert data['event_times'].first['event_time']['people'].first['person']
-      assert data['event_times'].first['event_time']['people'].first['person']['name']
+      assert_equal event.id, data['id']
+      assert_equal event.name, data['name']
+      assert_equal event.description, data['description']
+      assert data['times']
+      assert data['times'].kind_of?(Array)
+      assert data['times'].first['id']
+      assert data['times'].first['time']
+      assert data['times'].first['people']
+      assert data['times'].first['people'].kind_of?(Array)
+      assert data['times'].first['people'].first['id']
+      assert data['times'].first['people'].first['name']
     end
   end
 
