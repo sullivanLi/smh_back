@@ -21,7 +21,7 @@ class EventAPI < Sinatra::Base
   post '/events/:id/times' do
     event = Event.find(params['id'])
     if params['time'].present?
-      time = event.times.new(event_time: params['time'].in_time_zone)
+      time = event.times.new(event_time: params['time'].to_datetime)
       if time.valid?
         time.save
       else
