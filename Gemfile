@@ -5,6 +5,9 @@ gem 'activerecord', :require => 'active_record'
 gem 'sqlite3'
 gem 'rabl'
 gem 'mysql2'
+gem "capistrano", require: false
+gem 'capistrano-bundler', require: false
+gem 'capistrano-rbenv', require: false
 
 group :test do
   gem 'rack-test'
