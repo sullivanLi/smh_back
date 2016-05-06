@@ -4,6 +4,7 @@ Bundler.require(:default, (ENV['RACK_ENV'] || 'development').to_sym)
 
 db_options = YAML.load(File.read('./config/database.yml'))[ENV['RACK_ENV'] || 'development']
 ActiveRecord::Base.establish_connection(db_options)
+Time.zone = "Taipei";
 ActiveRecord::Base.default_timezone = :local
 
 # require active_model
