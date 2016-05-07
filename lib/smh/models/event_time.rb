@@ -7,7 +7,7 @@ class EventTime < ActiveRecord::Base
 
   alias_attribute :time, :event_time
 
-  def people_count
-    people.count
+  def time_str
+    time.strftime("%Y/%m/%d %H:%M")
   end
 end

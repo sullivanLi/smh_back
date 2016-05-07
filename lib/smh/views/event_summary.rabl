@@ -1,7 +1,7 @@
 object @event
 attributes :id, :name, :description
 child @event.times => 'times' do
-  attributes :id, :time
+  attributes :id, :time_str
   child :people do
     attributes :id, :name
   end
