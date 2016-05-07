@@ -7,7 +7,8 @@ class EventTime < ActiveRecord::Base
 
   alias_attribute :time, :event_time
 
-  def time_str
-    time.strftime("%Y/%m/%d %H:%M")
+  def date_str
+    dayOfWeek = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.']
+    time.strftime("%Y/%m/%d %H:%M") + ' (' + dayOfWeek[time.wday] + ')'
   end
 end
