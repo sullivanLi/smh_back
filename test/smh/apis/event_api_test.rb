@@ -7,11 +7,22 @@ class APITest < MiniTest::Unit::TestCase
 
   def test_create_event
     temporarily do
-      post '/events', {name: 'test_event', description: 'test_desc'}
+      dates = nil;
+      3.times do |i|
+        time = (Time.now + i * 86400).strftime("%Y/%m/%d %H:%M")
+        if dates.nil?
+          dates = time
+        else
+          dates = dates + ',' + time
+        end
+      end
+
+      post '/events', {name: 'test_event', dates: dates, description: 'test_desc'}
       event = Event.find_by_name('test_event')
 
       assert_equal 200, last_response.status
       assert_equal true, event.present?
+      assert_equal 3, event.times.length
       assert_equal event.description, 'test_desc'
     end
   end
@@ -80,7 +91,7 @@ class APITest < MiniTest::Unit::TestCase
       assert data['times']
       assert data['times'].kind_of?(Array)
       assert data['times'].first['id']
-      assert data['times'].first['time']
+      assert data['times'].first['date_str']
       assert data['times'].first['people']
       assert data['times'].first['people'].kind_of?(Array)
       assert data['times'].first['people'].first['id']

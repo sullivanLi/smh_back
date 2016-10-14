@@ -13,8 +13,18 @@ class EventAPI < Sinatra::Base
   post '/events' do
     name = params['name']
     desc = params['description']
+    dates = params['dates']
     if name.present? && desc.present?
-      Event.create(name: name, description: desc)
+      event = Event.create(name: name, description: desc)
+      if dates.present?
+        dates = dates.split(',')
+        dates.each do |date|
+          time = event.times.new(event_time: date.to_datetime)
+          time.save if time.valid?
+        end
+      end
+      status 200
+      { :id => event.id }.to_json
     end
   end
 
