@@ -27,6 +27,18 @@ class APITest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_user_fb_login
+    temporarily do
+      name = Faker::Name.name
+      fb_id = Faker::Number.number(10)
+      post "/people/fb", {name: name, fb_id: fb_id}
+      person = Person.find_by(fb_id: fb_id)
+
+      assert_equal 200, last_response.status
+      assert_equal person.name, name
+    end
+  end
+
   def test_add_time_to_event
     temporarily do
       event = create(:event)

@@ -10,6 +10,16 @@ class EventAPI < Sinatra::Base
     end
   end
 
+  post '/people/fb' do
+    fb_id = params['fb_id']
+    name = params['name']
+    if fb_id.present? && name.present?
+      person = Person.find_or_initialize_by(fb_id: fb_id)
+      person.name = name
+      person.save
+    end
+  end
+
   post '/events' do
     name = params['name']
     desc = params['description']
