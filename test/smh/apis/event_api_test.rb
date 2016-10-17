@@ -16,14 +16,16 @@ class APITest < MiniTest::Unit::TestCase
           dates = dates + ',' + time
         end
       end
+      person = create(:person)
 
-      post '/events', {name: 'test_event', dates: dates, description: 'test_desc'}
+      post '/events', {name: 'test_event', dates: dates, description: 'test_desc', fb_id: person.fb_id}
       event = Event.find_by_name('test_event')
 
       assert_equal 200, last_response.status
       assert_equal true, event.present?
       assert_equal 3, event.times.length
       assert_equal event.description, 'test_desc'
+      assert_equal event.owner.id, person.id
     end
   end
 

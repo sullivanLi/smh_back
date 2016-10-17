@@ -24,8 +24,12 @@ class EventAPI < Sinatra::Base
     name = params['name']
     desc = params['description']
     dates = params['dates']
-    if name.present? && desc.present?
-      event = Event.create(name: name, description: desc)
+    person = Person.find_by(fb_id: params['fb_id'])
+    if person.nil?
+      status 401
+      { :error => 'user is invalid.' }.to_json
+    elsif name.present? && desc.present?
+      event = Event.create(name: name, description: desc, owner: person)
       if dates.present?
         dates = dates.split(',')
         dates.each do |date|
