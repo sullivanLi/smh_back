@@ -79,6 +79,15 @@ class EventAPI < Sinatra::Base
     Rabl::Renderer.json(@event, 'event_summary')
   end
 
+  get '/events' do
+    person = Person.find_by(fb_id: params['fb_id'])
+    @events = []
+    if person.present?
+      @events = person.events
+    end
+    Rabl::Renderer.json(@events, 'event_list')
+  end
+
   get '/events/:id/people/:person_id' do
     event = Event.find(params['id'])
     person = Person.find(params['person_id'])

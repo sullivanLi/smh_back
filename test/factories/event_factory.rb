@@ -5,6 +5,7 @@ FactoryGirl.define do
 
   factory :event_with_times, class: Event do
     name "some gathering"
+    description Faker::Lorem.sentence
 
     after(:create) do |event|
       3.times do |i|
@@ -15,6 +16,7 @@ FactoryGirl.define do
 
   factory :event_with_all, class: Event do
     name "others gathering"
+    description Faker::Lorem.sentence
 
     after(:create) do |event|
       3.times do |i|

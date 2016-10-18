@@ -144,4 +144,19 @@ class APITest < MiniTest::Unit::TestCase
       assert data['available_people'].kind_of?(Array)
     end
   end
+
+  def test_get_my_all_events
+    temporarily do
+      person = create(:person)
+      create_list(:event_with_all, 3, owner: person)
+      get "/events", {fb_id: person.fb_id}
+
+      data = JSON.parse last_response.body
+      assert_equal 200, last_response.status
+      assert data.kind_of?(Array)
+      assert data.first['id']
+      assert data.first['name']
+      assert data.first['description']
+    end
+  end
 end
