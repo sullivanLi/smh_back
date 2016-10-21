@@ -63,6 +63,20 @@ class EventAPI < Sinatra::Base
     end
   end
 
+  delete '/events/:id' do
+    event = Event.find_by(id: params[:id])
+    person = Person.find_by(fb_id: params[:fb_id])
+    if person.present? && event.present?
+      if event.owner.id == person.id
+        event.delete
+      elsif
+        status 403
+      end
+    elsif
+      status 404
+    end
+  end
+
   delete '/times/:id/person' do
     if params['person_name'].present?
       event_time = EventTime.find(params['id'])

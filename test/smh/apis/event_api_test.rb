@@ -159,4 +159,35 @@ class APITest < MiniTest::Unit::TestCase
       assert data.first['description']
     end
   end
+
+  def test_delete_event
+    temporarily do
+      person = create(:person)
+      event = create(:event_with_all, owner: person)
+      delete "/events/#{event.id}", {fb_id: person.fb_id}
+
+      assert_equal 200, last_response.status
+      assert_equal nil, Event.find_by(id: event.id)
+    end
+  end
+
+  def test_delete_event_without_authority
+    temporarily do
+      person = create(:person)
+      owner = create(:person)
+      event = create(:event_with_all, owner: owner)
+      delete "/events/#{event.id}", {fb_id: person.fb_id}
+
+      assert_equal 403, last_response.status
+      assert event.reload
+    end
+  end
+
+  def test_delete_not_existing_event
+    temporarily do
+      delete "/events/11111", {fb_id: 11111}
+
+      assert_equal 404, last_response.status
+    end
+  end
 end

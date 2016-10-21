@@ -1,6 +1,6 @@
 class Event < ActiveRecord::Base
   belongs_to :person
-  has_many :times, class_name: "EventTime"
+  has_many :times, class_name: "EventTime", dependent: :destroy
 
   before_create :generate_random_id
   alias_attribute :owner, :person
