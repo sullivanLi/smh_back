@@ -69,9 +69,8 @@ class APITest < MiniTest::Unit::TestCase
     temporarily do
       event = create(:event_with_all)
       eventTime = event.times.sample
-      person_name = Faker::Name.name
-      post "/times/#{eventTime.id}/person", {person_name: person_name}
-      person = Person.find_by(name: person_name)
+      person = create(:person)
+      post "/times/#{eventTime.id}/person", {fb_id: person.fb_id}
 
       assert_equal 200, last_response.status
       assert_includes eventTime.people, person
@@ -83,8 +82,8 @@ class APITest < MiniTest::Unit::TestCase
       event = create(:event_with_all)
       eventTime = event.times.sample
       person = eventTime.people.sample
-      name = person.name
-      delete "/times/#{eventTime.id}/person", {person_name: name}
+      fb_id = person.fb_id
+      delete "/times/#{eventTime.id}/person", {fb_id: fb_id}
       eventTime.reload
 
       assert_equal 200, last_response.status

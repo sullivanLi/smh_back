@@ -13,10 +13,16 @@ class EventAPI < Sinatra::Base
   post '/people/fb' do
     fb_id = params['fb_id']
     name = params['name']
+    puts name
+    puts fb_id
     if fb_id.present? && name.present?
       person = Person.find_or_initialize_by(fb_id: fb_id)
       person.name = name
       person.save
+      status 200
+      { :id => person.id }.to_json
+    else
+      status 404
     end
   end
 
@@ -56,9 +62,9 @@ class EventAPI < Sinatra::Base
   end
   
   post '/times/:id/person' do
-    event_time = EventTime.find(params['id'])
-    if event_time.present? && params['person_name'].present?
-      person = Person.find_or_create_by(name: params['person_name'])
+    event_time = EventTime.find_by(id: params['id'])
+    person = Person.find_by(fb_id: params['fb_id'])
+    if event_time.present? && person.present?
       event_person_time = EventPersonTime.find_or_create_by(event_time_id: event_time.id, person_id: person.id)
     end
   end
@@ -78,19 +84,21 @@ class EventAPI < Sinatra::Base
   end
 
   delete '/times/:id/person' do
-    if params['person_name'].present?
-      event_time = EventTime.find(params['id'])
-      person = Person.find_by(name: params['person_name'])
-      if event_time.present? && person.present?
-        event_person_time = EventPersonTime.find_by(event_time_id: event_time.id, person_id: person.id)
-        event_person_time.delete if event_person_time.present?
-      end
+    event_time = EventTime.find_by(id: params['id'])
+    person = Person.find_by(fb_id: params['fb_id'])
+    if event_time.present? && person.present?
+      event_person_time = EventPersonTime.find_by(event_time_id: event_time.id, person_id: person.id)
+      event_person_time.delete if event_person_time.present?
     end
   end
 
   get '/events/:id' do
-    @event = Event.find(params['id'])
-    Rabl::Renderer.json(@event, 'event_summary')
+    @event = Event.find_by(id: params['id'])
+    if @event.present?
+      Rabl::Renderer.json(@event, 'event_summary')
+    else
+      status 404
+    end
   end
 
   get '/events' do
