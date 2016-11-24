@@ -29,6 +29,48 @@ class APITest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_update_event
+    temporarily do
+      person = create(:person)
+      event = create(:event_with_all, owner: person)
+      dates = nil;
+      2.times do |i|
+        time = (Time.now + i * 86400).strftime("%Y/%m/%d %H:%M")
+        if dates.nil?
+          dates = time
+        else
+          dates = dates + ',' + time
+        end
+      end
+      put "/events/#{event.id}", {name: 'test_event', dates: dates, description: 'test_desc', fb_id: person.fb_id}
+      event.reload
+
+      assert_equal 200, last_response.status
+      assert_equal 2, event.times.length
+      assert_equal event.name, 'test_event'
+      assert_equal event.description, 'test_desc'
+    end
+  end
+
+  def test_update_event_without_authority
+    person = create(:person)
+    event = create(:event_with_all, owner: person)
+    other_person = create(:person)
+    put "/events/#{event.id}", {name: 'test_event', description: 'test_desc', fb_id: other_person.fb_id}
+
+    assert_equal 403, last_response.status
+    refute_equal event.name, 'test_event'
+    refute_equal event.description, 'test_desc'
+  end
+
+  def test_update_not_existing_event
+    temporarily do
+      put "/events/11111", {fb_id: 11111}
+
+      assert_equal 404, last_response.status
+    end
+  end
+
   def test_user_fb_login
     temporarily do
       name = Faker::Name.name

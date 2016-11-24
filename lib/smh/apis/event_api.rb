@@ -5,7 +5,7 @@ class EventAPI < Sinatra::Base
     content_type :json
     response.headers["Access-Control-Allow-Origin"] = "*"
     if request.request_method == 'OPTIONS'
-      response.headers["Access-Control-Allow-Methods"] = "POST, DELETE"
+      response.headers["Access-Control-Allow-Methods"] = "POST, PUT, DELETE"
       halt 200
     end
   end
@@ -42,6 +42,37 @@ class EventAPI < Sinatra::Base
           time = event.times.new(event_time: date.to_datetime)
           time.save if time.valid?
         end
+      end
+      status 200
+      { :id => event.id }.to_json
+    end
+  end
+
+  put '/events/:id' do
+    name = params['name']
+    desc = params['description']
+    dates = params['dates']
+    person = Person.find_by(fb_id: params['fb_id'])
+    event = Event.find_by(id: params['id'])
+    if event.nil?
+      status 404
+      { :error => 'event is not existing.' }.to_json
+    elsif person.nil?
+      status 401
+      { :error => 'user is invalid.' }.to_json
+    elsif event.owner.fb_id != person.fb_id
+      status 403
+      { :error => 'user is not the owner.' }.to_json
+    elsif name.present? && desc.present?
+      event.update(name: name, description: desc)
+      if dates.present?
+        dates = dates.split(',')
+        dates.each do |date|
+          time = event.times.new(event_time: date.to_datetime)
+          time.save if time.valid?
+        end
+        dates.map!{ |date| date.to_datetime}
+        event.times.where.not(event_time: dates).destroy_all
       end
       status 200
       { :id => event.id }.to_json
